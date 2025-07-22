@@ -1,0 +1,35 @@
+name: Build Arduino Goodix
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Arduino CLI
+        uses: arduino/setup-arduino-cli@v1
+        with:
+          version: 'latest'
+
+      - name: Install dependencies
+        run: |
+          arduino-cli core update-index
+          arduino-cli core install arduino:avr
+
+      - name: Compile Sketches
+        run: |
+          for sketch in $(find . -name '*.ino'); do
+            echo "Compiling $sketch"
+            arduino-cli compile --fqbn arduino:avr:uno "$sketch"
+          done
